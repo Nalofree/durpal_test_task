@@ -1,10 +1,10 @@
 <?php
-    //function test_task_uninstall()
-    //{
-    //    cache_clear_all('test_task', 'cache', TRUE);
-    //    drupal_uninstall_schema('goods');
-    //    menu_rebuild();
-    //}
+    function test_task_uninstall()
+    {
+        cache_clear_all('test_task', 'cache', TRUE);
+        drupal_uninstall_schema('goods');
+        menu_rebuild();
+    }
 
     function test_task_schema()
     {
