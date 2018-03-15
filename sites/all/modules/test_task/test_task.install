@@ -1,0 +1,27 @@
+<?php
+    function test_task_uninstall()
+    {
+        cache_clear_all('test_task', 'cache', TRUE);
+        drupal_uninstall_schema('goods');
+        menu_rebuild();
+    }
+
+    function test_task_schema()
+    {
+        $schema['goods'] = array(
+            'fields' => array(
+                'id'        => array('type' => 'serial',  'size' =>'normal',  'not null' => TRUE),
+                'name'      => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+                'category'  => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+                'price'     => array('type' => 'float',   'not null' => FALSE),
+            ),
+            'primary key' => array('id'),
+            'unique keys' => array(
+                'name' => array(
+                  'name',
+                ),
+              ),
+        );
+
+        return $schema;
+    }

@@ -1,0 +1,224 @@
+<?php
+
+    function test_task_block_info(){
+        $blocks['test_task'] = array(
+            'info'  => t('TEST TASK'),
+            'cache' => DRUPAL_CACHE_PER_ROLE, // по умолчанию
+        );
+
+        return $blocks;
+    }
+
+    function test_task_menu()
+    {
+        $items = array();
+
+        $items['admin/config/content/test_task'] = array(
+            'title'            => 'Test task',
+            'description'      => 'Configure the TEST task goods list.',
+            'page callback'    => 'goods_list',
+            'access arguments' => array('administer site configuration'),
+        );
+        $items['admin/config/content/test_task/list'] = array(
+            'title'  => 'TEST task goods',
+            'type'   => MENU_DEFAULT_LOCAL_TASK,
+            'weight' => 1,
+        );
+
+        // good add form
+        $items['admin/config/content/test_task/add'] = array(
+            'title'            => 'Add good',
+            'page callback'    => 'drupal_get_form',
+            'page arguments'   => array('goods_form'),
+            'access arguments' => array('administer site configuration'),
+            'type'             => MENU_LOCAL_TASK,
+            'weight'           => 2,
+        );
+
+        // goods edit form
+        $items['admin/config/content/test_task/%good/edit'] = array(
+            'title'            => 'Edit goods',
+            'page callback'    => 'drupal_get_form',
+            'page arguments'   => array('goods_form', 4),
+            'access arguments' => array('administer site configuration'),
+            'type'             => MENU_CALLBACK,
+        );
+
+        // goods delete
+        $items['admin/config/content/test_task/%good/delete'] = array(
+            'title'            => 'Delete goods',
+            'page callback'    => 'goods_delete',
+            'page arguments'   => array(4),
+            'access arguments' => array('administer site configuration'),
+            'type'             => MENU_CALLBACK,
+        );
+
+        $items['goods'] = array(
+            'title'            => 'Goods',
+            'page callback'    => '_goods_page',
+            'access arguments' => array('access content'),
+        );
+
+        return $items;
+    }
+
+    function goods_form($form, &$form_state, $good = null)
+    {
+        $form['name'] = array(
+            '#title'         => t('good name.'),
+            '#description'   => t('Insert good name'),
+            '#type'          => 'textfield',
+            '#default_value' => $good ? $good['name'] : '',
+            '#required'      => true,
+        );
+
+        $form['category'] = array(
+            '#title'         => t('good category.'),
+            '#description'   => t('Insert good category'),
+            '#type'          => 'textfield',
+            '#default_value' => $good ? $good['category'] : '',
+            '#required'      => true,
+        );
+
+        $form['price'] = array(
+            '#title'         => t('good price.'),
+            '#description'   => t('Insert good price'),
+            '#type'          => 'textfield',
+            '#default_value' => $good ? $good['price'] : '',
+            '#required'      => true,
+        );
+
+        $form['submit'] = array(
+            '#type'  => 'submit',
+            '#value' => $good ? t('Save') : t('Add'),
+        );
+
+        if ($good) {
+            $form['id'] = array(
+                '#type'  => 'value',
+                '#value' => $good['id'],
+            );
+        }
+
+        return $form;
+    }
+
+//    function goods_form_validate($form, &$form_state)
+//    {
+//      Кsome validaton
+//    }
+
+    function goods_form_submit($form, &$form_state)
+    {
+        $good = array(
+            'name'      => $form_state['values']['name'],
+            'category'  => $form_state['values']['category'],
+            'price'     => $form_state['values']['price'],
+        );
+
+        // save edit data
+        if (isset($form_state['values']['id'])) {
+            $good['id'] = $form_state['values']['id'];
+            drupal_write_record('goods', $good, 'id');
+            drupal_set_message(t('Good saved!'));
+        } // add new data
+        else {
+            drupal_write_record('goods', $good);
+            drupal_set_message(t('Good added!'));
+        }
+
+        drupal_goto('admin/config/content/test_task');
+    }
+
+    function good_load($id)
+    {
+        $good = db_select('goods', 'g')
+            ->fields('g', array('id', 'name', 'category', 'price'))
+            ->condition('g.id', $id)
+            ->execute()->fetchAssoc();
+
+        return $good;
+    }
+
+    function goods_list()
+    {
+        $header = array(
+            array('data' => t('Name')),
+            array('data' => t('Category')),
+            array('data' => t('Price')),
+            array('data' => t('Actions'))
+        );
+        $goods = db_select('goods', 'g')
+            ->fields('g', array('id', 'name', 'category', 'price'))
+            ->execute()->fetchAll();
+        $row = array();
+        if ($goods) {
+            foreach ($goods as $good) {
+                $actions = array(
+                    l(t('edit'), 'admin/config/content/test_task/' . $good->id . '/edit'),
+                    l(t('delete'), 'admin/config/content/test_task/' . $good->id . '/delete'),
+                );
+
+                $row [] = array(
+                    array('data' => $good->name),
+                    array('data' => $good->category),
+                    array('data' => $good->price),
+                    array('data' => implode(' | ', $actions)),
+                );
+            }
+        }
+
+        return theme('table', array(
+            'header' => $header,
+            'rows'   => $row,
+        ));
+    }
+
+    function goods_delete($good)
+    {
+        $good_deleted = db_delete('goods')
+            ->condition('id', $good['id'])
+            ->execute();
+        drupal_set_message(t('Good deleted!'));
+        drupal_goto('admin/config/content/goods');
+    }
+
+    function goods_contents()
+    {
+        $query = db_select('goods', 'g')
+            ->fields('g', array('id', 'name', 'category', 'price'))
+            ->orderBy('name', 'DESC');
+
+        return $query->execute();
+    }
+
+    function _goods_page () {
+        drupal_set_title(t('Goods page'));
+
+        $result = goods_contents()->fetchAll();
+
+        if (!$result) {
+            $page_array['goods_arguments'] = array(
+                '#title'  => t('Goods page'),
+                '#markup' => t('No goods available'),
+            );
+
+            return $page_array;
+        } else {
+            $page_array = theme('goods_page', array('goods' => $result));
+            return $page_array;
+        }
+    }
+
+
+    function goods_theme()
+    {
+        return array(
+            'goods_page'    => array(
+                'variables' => array(
+                    'goods' => NULL
+                ),
+                'template'  => 'goods-page',
+            )
+        );
+    }
