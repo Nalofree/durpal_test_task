@@ -1,6 +1,7 @@
-name = Test task
+name = Goods
 description = Some description
 version = 7.x-dev
 core = 7.x
 package = My modules
 stylesheets[all][] = main.css
+scripts[] = main.js
