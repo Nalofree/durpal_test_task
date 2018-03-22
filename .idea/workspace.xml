@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1979337f-926b-49ac-a651-606b4bd892c2" name="Default" comment="install dpl and back module part">
-      <change beforePath="$PROJECT_DIR$/sites/all/modules/goods/goods.install" afterPath="$PROJECT_DIR$/sites/all/modules/goods/goods.install" />
-    </list>
+    <list default="true" id="1979337f-926b-49ac-a651-606b4bd892c2" name="Default" comment="install dpl and back module part" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="settings.php" pinned="false" current-in-tab="false">
+      <file leaf-file-name="settings.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/sites/default/settings.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-7119">
-              <caret line="251" column="26" lean-forward="false" selection-start-line="251" selection-start-column="21" selection-end-line="251" selection-end-column="26" />
+            <state relative-caret-position="269">
+              <caret line="364" column="38" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="644" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -46,7 +44,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="goods-page.tpl.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="goods-page.tpl.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/sites/all/modules/goods/goods-page.tpl.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="367">
@@ -81,6 +79,7 @@
       <find>goods_form</find>
       <find>goods_contents</find>
       <find>goods_main_page</find>
+      <find>doma</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -224,7 +223,7 @@
       <workItem from="1521393472751" duration="2358000" />
       <workItem from="1521490190315" duration="28000" />
       <workItem from="1521561232385" duration="31007000" />
-      <workItem from="1521658604941" duration="18564000" />
+      <workItem from="1521658604941" duration="19066000" />
     </task>
     <task id="LOCAL-00001" summary="install dpl and back module part">
       <created>1521137932036</created>
@@ -265,7 +264,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="72094000" />
+    <option name="totallyTimeSpent" value="72596000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
@@ -415,14 +414,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sites/default/settings.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7119">
-          <caret line="251" column="26" lean-forward="false" selection-start-line="251" selection-start-column="21" selection-end-line="251" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sites/all/modules/goods/goods.module">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="147">
@@ -443,6 +434,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="367">
           <caret line="18" column="30" lean-forward="true" selection-start-line="18" selection-start-column="30" selection-end-line="18" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sites/default/settings.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="364" column="38" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="644" selection-end-column="0" />
           <folding />
         </state>
       </provider>
