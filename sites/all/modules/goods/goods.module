@@ -1,0 +1,236 @@
+<?php
+
+//    drupal_add_js(drupal_get_path('module', 'goods').'/main.js');
+
+    function goods_block_info(){
+        $blocks['goods'] = array(
+            'info'  => t('GOODS'),
+            'cache' => DRUPAL_CACHE_PER_ROLE, // по умолчанию
+        );
+
+        return $blocks;
+    }
+
+    function goods_menu() {
+        $items = array();
+        $items['goods'] = array(
+            'title'            => 'Goods',
+            'page callback'    => 'goods_main_page',
+            'access arguments' => array('access content'),
+        );
+
+        // good add form
+        $items['goods/add'] = array(
+            'title'            => 'Add good',
+            'page callback'    => 'drupal_get_form',
+            'page arguments'   => array('goods_form'),
+            'access arguments' => array('access content'),
+            'type'             => MENU_LOCAL_TASK,
+            'weight'           => 2,
+        );
+
+        $items['goods/search'] = array(
+            'title'             =>  'Search',
+            'page callback'     =>  'goods_search',
+            'access arguments'    =>array('access content'),
+            'type'             => MENU_LOCAL_TASK,
+        );
+
+        // good edit form
+        $items['goods/%good/edit'] = array(
+            'title'            => 'Edit good',
+            'page callback'    => 'drupal_get_form',
+            'page arguments'   => array('goods_form', 1),
+            'access arguments' => array('access content'),
+            'type'             => MENU_CALLBACK,
+        );
+
+        // good delete
+        $items['goods/%good/delete'] = array(
+            'title'            => 'Delete good',
+            'page callback'    => 'goods_delete',
+            'page arguments'   => array(1),
+            'access arguments' => array('access content'),
+            'type'             => MENU_CALLBACK,
+        );
+
+        return $items;
+    }
+
+    function goods_form($form, $form_state, $good = null)
+    {
+        $form['name'] = array(
+            '#title'         => t('Good name.'),
+            '#description'   => t('Insert Good shortcut name'),
+            '#type'          => 'textfield',
+            '#default_value' => $good ? $good['name'] : '',
+            '#required'      => true,
+            '#attributes' => array(
+                'class' => array(
+                    'form-controle'
+                )
+            )
+        );
+
+        $form['category'] = array(
+            '#title'         => t('Good category.'),
+            '#description'   => t('Choose Good category'),
+            '#type'          => 'select',
+            '#options' => array(
+                0 => 'cat',
+                1 => 'another cat',
+                2 => 'some thing else',
+            ),
+            '#default_value' => $good ? $good['category'] : '',
+            "#empty_option"=>t('- Select category -'),
+            '#required'      => true,
+        );
+
+
+        $form['price'] = array(
+            '#title'         => t('Good price.'),
+            '#description'   => t('Insert Good price'),
+            '#type'          => 'textfield',
+            '#default_value' => $good ? $good['price'] : '',
+            '#required'      => true,
+        );
+
+        $form['submit'] = array(
+            '#type'  => 'submit',
+            '#value' => $good ? t('Save') : t('Add'),
+        );
+
+        if ($good) {
+            $form['id'] = array(
+                '#type'  => 'value',
+                '#value' => $good['id'],
+            );
+        }
+
+        return $form;
+    }
+
+    function goods_form_submit($form, &$form_state)
+    {
+        $good = array(
+            'name'       => $form_state['values']['name'],
+            'category'        => $form_state['values']['category'],
+            'price'        => $form_state['values']['price'],
+        );
+
+        // save edit data
+        if (isset($form_state['values']['id'])) {
+            $good['id'] = $form_state['values']['id'];
+            drupal_write_record('goods', $good, 'id');
+            drupal_set_message(t('Good saved!'));
+        } // add new data
+        else {
+            drupal_write_record('goods', $good);
+            drupal_set_message(t('Good added!'));
+        }
+
+        drupal_goto('goods');
+    }
+
+    function goods_delete($good) {
+        $goods_deleted = db_delete('goods')
+            ->condition('id', $good['id'])
+            ->execute();
+        drupal_set_message(t('Good deleted!'));
+        drupal_goto('goods');
+    }
+
+    function good_load($id) {
+        $good = db_select('goods', 'g')
+            ->fields('g', array('id', 'name', 'category', 'price'))
+            ->condition('g.id', $id)
+            ->execute()->fetchAssoc();
+
+        return $good;
+    }
+
+    function goods_search() {
+        $query = drupal_get_query_parameters();
+        if (!$query) {
+            drupal_goto('goods');
+        }
+        if(strlen($query['name_search']) > 0 || strlen($query['cat_search']) > 0) {
+//            var_dump($query);
+            return goods_main_page($query);
+        }else{
+            drupal_goto('goods');
+        }
+
+        return false;
+    }
+
+    function goods_contents($search = NULL){
+        $query = db_select('goods', 'g')
+            ->fields('g', array('id', 'name', 'category', 'price'))
+            ->orderBy('name', 'DESC');
+        if ($search != NULL) {
+            if (strlen($search['name_search']) > 0){
+                $query->condition('name', '%'.$search['name_search'].'%', 'LIKE');
+            }
+
+            if (strlen($search['cat_search']) > 0){
+                $query->condition('category', $search['cat_search'], '=');
+            }
+
+        }
+        return $query->execute();
+    }
+
+    function goods_theme() {
+        return array(
+            'goods_page'    => array(
+                'variables' => array(
+                    'goods' => NULL
+                ),
+                'template'  => 'goods-page',
+            )
+        );
+    }
+
+    function goods_main_page($search = NULL){
+        drupal_set_title(t('Goods main page'));
+        $cats = [
+            0 => 'cat',
+            1 => 'another cat',
+            2 => 'some thing else',
+        ];
+        $result_arr = goods_contents($search)->fetchAll();
+        $result = goods_contents();
+        if ($result) {
+            foreach ($result as $res_item) {
+                $actions = array(
+                    l(t('edit'), 'goods/' . $res_item->id . '/edit'),
+                    l(t('delete'), 'goods/' . $res_item->id . '/delete'),
+                );
+                $row [] = array(
+                    array('data' => $res_item->name),
+                    array('data' => $res_item->category),
+                    array('data' => $res_item->price),
+                    array('data' => implode(' | ', $actions)),
+                );
+            }
+        }
+        $header = array(
+            array('data' => t('Name')),
+            array('data' => t('Category')),
+            array('data' => t('Price')),
+            array('data' => t('Actions'))
+        );
+
+        if (!$result) {
+            $page_array['goods_arguments'] = array(
+                '#title'  => t('Goods page'),
+                '#markup' => t('No goods available'),
+            );
+            return $page_array;
+        } else {
+//            $page_array = theme('table', array('header'=>$header, 'rows'=>$row));
+            $page_array = theme('goods_page', array('goods'=>$result_arr, 'cats' => $cats, 'search_params' => $search));
+            return $page_array;
+        }
+    }

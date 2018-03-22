@@ -1,0 +1,18 @@
+.sortfield {
+    cursor: pointer;
+    /*content: "Назвение \21D1\21D3";*/
+}
+/* 21D1 21D3 */
+
+.sortfield:after {
+    position: absolute;
+    content: "\21D1 \21D3";
+}
+
+.sortfield.asc:after {
+    content: "\21D1";
+}
+
+.sortfield.desc:after {
+    content: "\21D3";
+}
